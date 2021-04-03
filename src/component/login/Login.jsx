@@ -1,16 +1,54 @@
-import React from 'react'
-import { Form, Input, Checkbox, Button } from 'antd';
-
-
+import React, { useContext, useCallback } from 'react'
+import { useHistory } from 'react-router-dom';
+import { Form, Input, Checkbox, Button, message } from 'antd';
+import jwtDecode from 'jwt-decode';
+import { Context } from '../../context/userContext';
+import { setLogin } from "../../context/actions/userActions"
+import setAuthToken from '../../helper/setAuthToken';
 
 const Login = () => {
 
-    const email = React.useRef("");
+    const { dispatch } = useContext(Context);
+
+    const history = useHistory();
+
+    const username = React.useRef("");
     const pass = React.useRef("");
 
+    const login = useCallback(
+        async (user) => {
+            await fetch(`api/login`, {
+                method: "POST",
+                body: JSON.stringify(user),
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+            }).then(res => res.json())
+                .then(
+                    async res => {
+                        console.log(res);
+                        if (res.status === 403 || res.message === "Access Denied") {
+                            message.error("username or password are wrong !!");
+                        } else {
+                            var decode = await jwtDecode(res.jwt);
+                            if (decode.roles[0] === "ADMIN") {
+                                message.success("Login succes !!");
+                                await dispatch(setLogin(res.jwt));
+                                setAuthToken(res.jwt);
+                                window.localStorage.setItem('token', res.jwt);
+                                window.localStorage.setItem('refreshJwt', res.refreshJwt);
+                                history.push("/");
+                            } else {
+                                message.error("Acces denied !!");
+                            }
+                        }
+                    });
+        },
+        [dispatch, history],
+    );
 
     const onFinish = async values => {
-        console.log(values);
+        await login(values);
     }
 
     return (
@@ -32,16 +70,14 @@ const Login = () => {
                                                 layout="vertical"
                                             >
                                                 <Form.Item
-                                                    label="Email"
-                                                    name="email"
+                                                    label="username"
+                                                    name="username"
                                                     className="small mb-1 my-4"
                                                     rules={[
-                                                        { required: true, message: 'email required!' },
-                                                        { type: 'email', message: 'Incorrect email!' }
+                                                        { required: true, message: 'username required!' },
                                                     ]}
-                                                    ref={email}
                                                 >
-                                                    <Input size="large" className="form-control py-2" ref={email} />
+                                                    <Input size="large" className="form-control py-2" ref={username} />
                                                 </Form.Item>
                                                 <div className="form-group">
                                                     <Form.Item

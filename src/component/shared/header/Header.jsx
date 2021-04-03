@@ -1,20 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import * as Icon from 'react-feather';
 import { Link, useHistory } from 'react-router-dom';
-
+import { Context } from "../../../context/userContext"
+import { logout } from "../../../context/actions/userActions"
 const Header = () => {
-
+    const { dispatch } = useContext(Context)
     const [user] = useState({
         nom: "Admin",
         prenom: "ADMIN",
         email: "admin@gmail.com"
     });
+
     const history = useHistory();
 
-    const logOut = () => {
-        window.localStorage.clear();
+    const logOut = async () => {
+        await window.localStorage.clear();
+        await dispatch(logout())
         history.push("/login");
     }
+
     return (
         <>
             <nav className="topnav navbar navbar-expand shadow navbar-light bg-white" id="sidenavAccordion">

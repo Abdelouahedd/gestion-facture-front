@@ -1,7 +1,7 @@
 import React from 'react'
 import { Route, Router, Switch } from 'react-router-dom'
 import history from './helper/history'
-import Login from "./component/Authentication/loginForm/Login";
+import Login from "./component/login/Login";
 
 const Unauthenticated = () => (
     <Router history={history} >
