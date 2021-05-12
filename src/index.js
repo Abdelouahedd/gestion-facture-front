@@ -7,9 +7,9 @@ import 'antd/dist/antd.css';
 import '@fortawesome/fontawesome-free/css/all.css'
 
 ReactDOM.render(
-  <React.StrictMode>
+  <React.Fragment>
     <App />
-  </React.StrictMode>,
+  </React.Fragment>,
   document.getElementById('root')
 );
 
