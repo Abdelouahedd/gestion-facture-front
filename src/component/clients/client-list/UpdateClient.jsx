@@ -1,19 +1,14 @@
-import React, {useEffect, useState} from 'react'
-import {Form, Input, Modal} from 'antd';
+import React, {useEffect} from 'react'
+import {Button, Form, Input, Modal} from 'antd';
 
 export default function UpdateClient({loading, visibility, client, update, cancel}) {
 
     const [form] = Form.useForm();
-    const [user, setUser] = useState(client);
 
     const onFinish = async (values) => {
         await update({...values, id: client.id});
         form.resetFields()
     }
-
-    useEffect(() => {
-        setUser(client)
-    }, [client.id])
 
     useEffect(() => {
         form.setFieldsValue(client)
@@ -23,9 +18,14 @@ export default function UpdateClient({loading, visibility, client, update, cance
             title="Mise a jour du client"
             visible={visibility}
             loading={loading}
-            onOk={cancel}
             onCancel={cancel}
             forceRender
+            footer={[
+                <Button key="submit" type="primary"
+                        onClick={() => cancel()}>
+                    ok
+                </Button>
+            ]}
         >
             <Form
                 form={form}
@@ -69,9 +69,13 @@ export default function UpdateClient({loading, visibility, client, update, cance
                 </Form.Item>
                 <Form.Item>
                     <div className="container">
-                        <button className="btn btn-outline-info col align-self-end" type="submit">
-                            Mise a jour
-                        </button>
+                        <div className="row">
+                            <div className="d-flex justify-content-center">
+                                <button className="btn btn-block btn-outline-info col" type="submit">
+                                    Mise a jour
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </Form.Item>
             </Form>

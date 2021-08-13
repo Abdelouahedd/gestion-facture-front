@@ -131,6 +131,9 @@ export default function ClientList() {
                                         ..
                                     </div>
                                 </div>
+                                <div className="col-auto mt-4">
+                                    <button className="btn btn-block btn-dark">Ajouter nouveau client</button>
+                                </div>
                             </div>
                             <div className="page-header-search mt-4">
                                 <div className="input-group input-group-joined">
