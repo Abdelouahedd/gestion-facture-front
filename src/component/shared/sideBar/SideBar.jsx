@@ -34,7 +34,7 @@ const SideBar = () => {
                                 icon={<UsergroupDeleteOutlined style={{ fontSize: '22px' }} />}
                                 title="Gestion des utilisateur"
                             >
-                                <Menu.ItemGroup key="et" title="Client" >
+                                <Menu.ItemGroup key="g1" title="Client" >
                                     <Menu.Item key="1">
                                         <Link to="/list-client">
                                             <i className="fa fa-users px-2" aria-hidden="true"></i>

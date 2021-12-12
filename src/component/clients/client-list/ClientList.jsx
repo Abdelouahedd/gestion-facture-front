@@ -177,9 +177,9 @@ export default function ClientList() {
                                                 pageSize: pagination.pageSize
                                             }}
                                             onChange={e => setPagination(e)}
-                                            size="middle"
+                                            size="small"
                                         >
-                                            <Column title="ID" dataIndex="id" key="id"/>
+                                            <Column title="ID" dataIndex="id" key="id" />
                                             <Column
                                                 title="Nom"
                                                 dataIndex="nom"
@@ -200,7 +200,7 @@ export default function ClientList() {
                                                 title="Action"
                                                 key="action"
                                                 render={(text, record) => (
-                                                    <Space size="middle">
+                                                    <Space size="small" key={record.id} >
                                                         <Popconfirm title="Sure to delete?"
                                                                     onConfirm={() => handledeleteClient(record.id)}
                                                         >
