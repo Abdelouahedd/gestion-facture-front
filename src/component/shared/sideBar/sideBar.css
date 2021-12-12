@@ -1,0 +1,16 @@
+
+.sidenav {
+  height: 100%;
+  position: fixed;
+  z-index: 1;
+  overflow-x: hidden;
+}
+
+
+@media screen and (max-height: 450px) {
+  /*
+  .sidenav {padding-top: 2px;}
+  */
+}
+
+

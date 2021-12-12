@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import * as Icon from 'react-feather';
-import { Link } from 'react-router-dom';
-import { Menu } from 'antd';
-import { UsergroupDeleteOutlined } from '@ant-design/icons';
+import {Link} from 'react-router-dom';
+import {Menu} from 'antd';
+import {UsergroupDeleteOutlined} from '@ant-design/icons';
+import './sideBar.css'
 
-const { SubMenu } = Menu;
+const {SubMenu} = Menu;
 
 const SideBar = () => {
     const [user] = useState({
@@ -52,14 +53,14 @@ const SideBar = () => {
                     </div>
                 </div>
 
-                <div className="sidenav-footer">
-                    <div className="sidenav-footer-content">
-                        <div className="sidenav-footer-subtitle">Logged in as:</div>
-                        <div className="sidenav-footer-title">{user.nom + " " + user.prenom}</div>
-                    </div>
-                </div>
-            </nav>
+        <div className="sidenav-footer">
+          <div className="sidenav-footer-content">
+            <div className="sidenav-footer-subtitle">Logged in as:</div>
+            <div className="sidenav-footer-title">{user.nom + " " + user.prenom}</div>
+          </div>
         </div>
-    )
+      </nav>
+    </div>
+  )
 }
 export default SideBar
