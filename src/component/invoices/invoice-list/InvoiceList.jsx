@@ -1,33 +1,29 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {Popconfirm, Space, Table} from 'antd';
-import axios from 'axios';
-import ClientForm from './ClientForm';
-
+import React, {useCallback, useEffect, useState} from 'react';
+import {Col, Popconfirm, Row, Space, Switch, Table, Tag} from "antd";
+import axios from "axios";
 
 const {Column} = Table;
 
-export default function ClientList() {
-
-  const nom = useRef("")
-  const [clients, setClients] = useState([])
-  const [totalElements, setTotalElements] = useState()
+function InvoiceList() {
+  const [loading, setLoading] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [factures, setFactures] = useState([])
+  const [selectedInvoice, setSelectedInvoice] = useState({id: 0})
+  const [totalElements, setTotalElements] = useState(0)
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
 
-  const [loading, setLoading] = useState(false)
-  const [visible, setVisible] = useState(false)
-  const [selectedClient, setSelectedClient] = useState({id: 0})
 
-  const getClients = useCallback(
+  const getFactures = useCallback(
     async () => {
       await axios({
         method: 'GET',
-        url: `api/clients?size=${pagination.pageSize}&page=${pagination.current - 1}&q=${nom.current.value}`,
+        url: `api/factures?size=${pagination.pageSize}&page=${pagination.current - 1}`,
       })
         .then(res => {
-          setClients(res.data.content);
+          setFactures(res.data.content);
           setTotalElements(res.data.totalElements)
         })
         .catch(error => console.log('err -> ', error))
@@ -35,95 +31,10 @@ export default function ClientList() {
     [pagination],
   );
 
-  const chercherClient = useCallback(
-    async (e) => {
-      if (e.key === 'Enter') {
-        await axios({
-          method: 'GET',
-          url: `api/clients?q=${nom.current.value}`,
-        })
-          .then(res => {
-            setClients(res.data.content);
-            setTotalElements(res.data.totalElements)
-          })
-          .catch(error => console.log('err -> ', error))
-      }
-    },
-    [pagination],
-  );
-
-  const deleteClient = useCallback(
-    async (id) => {
-      await axios({
-        method: 'DELETE',
-        url: `api/client/${id}`,
-      })
-        .then(res => console.log("data --> ", res))
-        .catch(error => console.log('errr -> ', error))
-    },
-    [],
-  )
-  const handledeleteClient = async (key) => {
-    var dataSource = [...clients];
-    dataSource = dataSource.filter((item) => item.id !== key);
-    setClients(dataSource);
-    await deleteClient(key);
-  }
-
-  const editClient = useCallback(
-    async (client) => {
-      setLoading(true)
-      await axios({
-        method: 'PUT',
-        url: `api/client/${client.id}`,
-        data: JSON.stringify(client),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-        .then(res => setLoading(false))
-        .catch(error => console.log('errr -> ', error))
-    }, [])
-
-  const addClient = useCallback(
-    async (client) => {
-      setLoading(true)
-      await axios({
-        method: 'POST',
-        url: `api/client`,
-        data: JSON.stringify(client),
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        }
-      })
-        .then(res => setLoading(false))
-        .catch(error => console.log('errr -> ', error))
-    }, [])
-
-  const handlEditClient = async (record) => {
-    let client = {...record};
-    setSelectedClient(client)
-    setVisible(true)
-  }
-
-  const updateClient = async (client) => {
-    let newClients = clients.map((c) => (c.id === client.id ? client : c))
-    console.log("new clients : ", newClients)
-    setClients(newClients)
-    setVisible(false)
-    await editClient(client)
-  }
-  const addNewClient = async (client) => {
-    clients.push((client))
-    console.log("new clients : ", clients)
-    setClients(clients)
-    setVisible(false)
-    await addClient(client)
-  }
-
   useEffect(() => {
-    getClients()
-  }, [getClients]);
+    getFactures().then(r => console.log(r))
+  }, [getFactures]);
+
 
   return (
     <div id="layoutSidenav_content">
@@ -148,9 +59,9 @@ export default function ClientList() {
                         <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
                       </svg>
                     </div>
-                    List des clients
+                    List des factures
                   </h1>
-                  <div className="page-header-subtitle">Vous pouvez chercher votre clients par nom
+                  <div className="page-header-subtitle">Vous pouvez chercher un facture par
                     ..
                   </div>
                 </div>
@@ -169,9 +80,7 @@ export default function ClientList() {
                          placeholder="chercher..."
                          aria-label="Search"
                          autoFocus=""
-                         ref={nom}
 
-                         onKeyPress={(e) => chercherClient(e)}
                   />
                   <div className="input-group-append">
                                         <span className="input-group-text"><svg xmlns="http://www.w3.org/2000/svg"
@@ -196,8 +105,9 @@ export default function ClientList() {
                 <div className="card-body">
                   <div className="datatable">
                     <Table
-                      dataSource={clients}
+                      dataSource={factures}
                       pagination={{
+                        defaultPageSize: 10,
                         showSizeChanger: true,
                         total: totalElements,
                         current: pagination.current,
@@ -205,42 +115,73 @@ export default function ClientList() {
                       }}
                       onChange={e => setPagination(e)}
                       size="small"
+                      sticky
                     >
-                      <Column title="ID" dataIndex="id" key="id"/>
+                      <Column title="#Numero" dataIndex="id" key="id" width="100px"/>
                       <Column
-                        title="Nom"
-                        dataIndex="nom"
-                        key="nom"
+                        title="Total"
+                        dataIndex="total"
+                        key="total"
                       />
                       <Column
-                        title="Prenom"
-                        dataIndex="prenom"
-                        key="prenom"
+                        title="Document"
+                        dataIndex="document"
+                        key="document"
+                        render={(text, record) => {
+                          return (
+                            <a href={record.document.document} target="_blank">{record.document.document}</a>
+                          )
+                        }}
                       />
 
                       <Column
-                        title="Telephone"
-                        dataIndex="telephone"
-                        key="telephone"
+                        title="Complete"
+                        dataIndex="complete"
+                        key="complete"
+                        render={(text, record) => {
+                          if (record.complete === true) {
+                            return (
+                              <Tag color="green" key={record.id}>
+                                Prix complet
+                              </Tag>
+                            )
+                          } else {
+                            return (
+                              <Tag color="red" key={record.id}>
+                                Prix non complet
+                              </Tag>
+                            )
+                          }
+
+                        }}
                       />
                       <Column
                         title="Action"
                         key="action"
-                        width="100px"
+                        align="center"
+                        width="280px"
                         render={(text, record) => (
-                          <Space size="small" key={record.id}>
-                            <Popconfirm title="Sure to delete?"
-                                        onConfirm={() => handledeleteClient(record.id)}
-                            >
-                              <button className="btn btn-danger btn-sm">
-                                <i className="fa fa-trash" aria-hidden="true"></i>
+                          <Row justify="center">
+                            <Col span={4}>
+                              <Popconfirm title="Sure to delete?"
+                              >
+                                <button className="btn btn-danger btn-sm">
+                                  <i className="fa fa-trash" aria-hidden="true"></i>
+                                </button>
+                              </Popconfirm>
+                            </Col>
+                            <Col span={4}>
+                              <button className="btn btn-success btn-sm">
+                                <i className="fa fa-edit" aria-hidden="true"></i>
                               </button>
-                            </Popconfirm>
-                            <button className="btn btn-success btn-sm"
-                                    onClick={() => handlEditClient(record)}>
-                              <i className="fa fa-edit" aria-hidden="true"></i>
-                            </button>
-                          </Space>
+                            </Col>
+                            <Col span={4}>
+
+                              <button className="btn btn-primary btn-sm">
+                                <i className="fa fa-download" aria-hidden="true"></i>
+                              </button>
+                            </Col>
+                          </Row>
                         )}
                       />
                     </Table>
@@ -251,14 +192,8 @@ export default function ClientList() {
           </div>
         </div>
       </main>
-      <ClientForm
-        client={selectedClient}
-        visibility={visible}
-        loading={loading}
-        update={updateClient}
-        add={addNewClient}
-        cancel={() => setVisible(false)}
-      />
     </div>
-  )
+  );
 }
+
+export default InvoiceList;

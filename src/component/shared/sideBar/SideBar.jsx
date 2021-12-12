@@ -43,6 +43,19 @@ const SideBar = () => {
                                     </Menu.Item>
                                 </Menu.ItemGroup>
                             </SubMenu>
+                          <SubMenu key="factures"
+                                   icon={ <i className="fa fa-file-invoice" aria-hidden="true" style={{ fontSize: '22px' }}></i>}
+                                   title="Gestion des factures"
+                          >
+                            <Menu.ItemGroup key="g2" title="Factures" >
+                              <Menu.Item key="2">
+                                <Link to="/list-facture">
+                                  <i className="fa fa-file-invoice-dollar px-2" aria-hidden="true"></i>
+                                  List des factures
+                                </Link>
+                              </Menu.Item>
+                            </Menu.ItemGroup>
+                          </SubMenu>
                         </Menu>
                     </div>
                 </div>
