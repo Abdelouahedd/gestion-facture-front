@@ -24,7 +24,7 @@ export default function ClientList() {
         async () => {
             await axios({
                 method: 'GET',
-                url: `api/clients?size=${pagination.pageSize}&page=${pagination.current - 1}`,
+                url: `api/clients?size=${pagination.pageSize}&page=${pagination.current - 1}&q=${nom.current.value}`,
             })
                 .then(res => {
                     setClients(res.data.content);
@@ -40,10 +40,11 @@ export default function ClientList() {
             if (e.key === 'Enter') {
                 await axios({
                     method: 'GET',
-                    url: `api/client?nom=${nom.current.value}`,
+                    url: `api/clients?q=${nom.current.value}`,
                 })
                     .then(res => {
-                        console.log(res);
+                      setClients(res.data.content);
+                      setTotalElements(res.data.totalElements)
                     })
                     .catch(error => console.log('err -> ', error))
             }
