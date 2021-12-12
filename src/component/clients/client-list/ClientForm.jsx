@@ -1,12 +1,22 @@
 import React, {useEffect} from 'react'
 import {Form, Input, Modal} from 'antd';
 
-export default function UpdateClient({loading, visibility, client, update, cancel}) {
+export default function ClientForm({loading, visibility, client, update, add, cancel}) {
 
   const [form] = Form.useForm();
 
   const onFinish = async (values) => {
-    await update({...values, id: client.id});
+    if (client.id === 0) {
+      let newClient = {
+        nom: values.nom,
+        prenom: values.prenom,
+        telephone: values.telephone
+      }
+      console.log("client add ", newClient)
+      await add(newClient)
+    } else {
+      await update({...values, id: client.id});
+    }
   }
 
   useEffect(() => {

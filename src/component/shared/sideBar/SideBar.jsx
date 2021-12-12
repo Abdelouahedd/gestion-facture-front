@@ -41,12 +41,6 @@ const SideBar = () => {
                                             List des clients
                                     </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="2">
-                                        <Link to="/ajouter-client">
-                                            <i className="fa fa-user-plus px-2" aria-hidden="true"></i>
-                                            Ajouter client
-                                        </Link>
-                                    </Menu.Item>
                                 </Menu.ItemGroup>
                             </SubMenu>
                         </Menu>
