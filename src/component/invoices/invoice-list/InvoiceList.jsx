@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Col, Popconfirm, Row, Space, Switch, Table, Tag} from "antd";
+import {Col, message, Popconfirm, Row, Table, Tag} from "antd";
 import axios from "axios";
+import InvoiceForm from "./InvoiceForm";
 
 const {Column} = Table;
 
@@ -8,7 +9,7 @@ function InvoiceList() {
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
   const [factures, setFactures] = useState([])
-  const [selectedInvoice, setSelectedInvoice] = useState({id: 0})
+  const [selectedInvoice, setSelectedInvoice] = useState({id: 0, document: {id: 0, document: ""}})
   const [totalElements, setTotalElements] = useState(0)
   const [pagination, setPagination] = useState({
     current: 1,
@@ -32,9 +33,70 @@ function InvoiceList() {
   );
 
   useEffect(() => {
-    getFactures().then(r => console.log(r))
+    console.log("GET FACTURE")
+    getFactures()
   }, [getFactures]);
 
+  const addInvoice = useCallback(
+    async (factureRequest) => {
+      setLoading(true)
+      await axios({
+        method: 'POST',
+        url: `api/facture`,
+        data: JSON.stringify(factureRequest),
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then(res => {
+          setLoading(false)
+          message.success(`Facture num ${res.data.id} bien ajoutée.`);
+          let newInvoices = [...res.data, factures]
+          setFactures(newInvoices)
+        })
+        .catch(error => console.log('errr -> ', error))
+    }, [])
+
+  const updateOldInvoice = useCallback(
+    async (factureRequest) => {
+      setLoading(true)
+      await axios({
+        method: 'PUT',
+        url: `api/facture/${factureRequest.id}`,
+        data: JSON.stringify(factureRequest),
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then(res => {
+          console.log(res)
+          console.log("factures : ", factures)
+          let bills = factures.map((f) => (res.data.id === f.id ? res.data : f))
+          console.log("new bills : ", bills)
+          setFactures(bills)
+          setLoading(false)
+          message.success(`Facture num ${res.data.id} est mis en à jour.`);
+        })
+        .catch(error => console.log('errr -> ', error))
+    }, [])
+
+
+  let addNewInvoice = async (facture) => {
+    setVisible(false)
+    await addInvoice(facture)
+  }
+  let updateInvoice = async (facture) => {
+    setVisible(false)
+    await updateOldInvoice(facture).then(res=>{
+
+    })
+  }
+
+  const handleEditInvoice = (record) => {
+    let invoice = {...record};
+    setSelectedInvoice(invoice);
+    setVisible(true)
+  }
 
   return (
     <div id="layoutSidenav_content">
@@ -69,7 +131,7 @@ function InvoiceList() {
 
                   <button className="btn btn-block btn-dark" onClick={() => setVisible(true)}>
                     <i className="fa fa-user-plus px-2" aria-hidden="true"></i>
-                    Ajouter nouveau client
+                    Ajouter nouvelle facture
                   </button>
                 </div>
               </div>
@@ -129,7 +191,7 @@ function InvoiceList() {
                         key="document"
                         render={(text, record) => {
                           return (
-                            <a href={record.document.document} target="_blank">{record.document.document}</a>
+                            <a href="#" target="_blank">{record.document.document}</a>
                           )
                         }}
                       />
@@ -152,7 +214,6 @@ function InvoiceList() {
                               </Tag>
                             )
                           }
-
                         }}
                       />
                       <Column
@@ -171,12 +232,11 @@ function InvoiceList() {
                               </Popconfirm>
                             </Col>
                             <Col span={4}>
-                              <button className="btn btn-success btn-sm">
+                              <button className="btn btn-success btn-sm" onClick={() => handleEditInvoice(record)}>
                                 <i className="fa fa-edit" aria-hidden="true"></i>
                               </button>
                             </Col>
                             <Col span={4}>
-
                               <button className="btn btn-primary btn-sm">
                                 <i className="fa fa-download" aria-hidden="true"></i>
                               </button>
@@ -192,6 +252,14 @@ function InvoiceList() {
           </div>
         </div>
       </main>
+      <InvoiceForm
+        facture={selectedInvoice}
+        visibility={visible}
+        loading={loading}
+        update={updateInvoice}
+        add={addNewInvoice}
+        cancel={() => setVisible(false)}
+      />
     </div>
   );
 }
