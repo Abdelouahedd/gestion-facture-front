@@ -1,0 +1,15 @@
+.search-bar {
+  border: 1px #e4e9f0 solid;
+  border-radius: 8px;
+  padding: 10px 10px 10px 10px !important;
+  background-color: white;
+  margin-bottom: 8px;
+}
+
+.search-select {
+  width: 100%;
+}
+#search:hover{
+  background-color: #d7dce3;
+  cursor: pointer;
+}

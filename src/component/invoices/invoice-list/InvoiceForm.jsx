@@ -8,17 +8,35 @@ import {Context} from "../../../context/userContext";
 const {Dragger} = Upload;
 
 
+export const inputNumberValidator = (rule, value) => {
+  if (!value) {
+    return Promise.resolve()
+  }
+  let min = rule.min
+  const message = rule.message
+  if (min != null) min = Number(min)
+  try {
+    const object = Number(value)
+    if (min != null && object < min) throw new Error(message)
+    if (isNaN(object)) throw new Error(message)
+    return Promise.resolve()
+  } catch (err) {
+    return Promise.reject(err)
+  }
+}
+
 export default function InvoiceForm({loading, visibility, facture, add, update, cancel}) {
 
   const [form] = Form.useForm();
   const {user} = useContext(Context);
   const [document, setDocument] = useState(facture.document)
+  const [files, setFiles] = useState([])
 
   const onFinish = async (values) => {
     if (facture.id === 0) {
       let factureRequest = {
         total: values.total,
-        documentId: document.id
+        documentId: document.id === 0 ? null : document.id
       }
       await add(factureRequest)
     } else {
@@ -31,6 +49,22 @@ export default function InvoiceForm({loading, visibility, facture, add, update, 
     }
   }
 
+  useEffect(() => {
+    if (facture.document.id !== 0) {
+      let doc = {
+        uid: '-1',
+        name: `Facture num : ${facture.id}`,
+        status: 'done',
+        url: facture?.document.document
+      };
+      let files = [doc]
+      setFiles(files);
+    }
+    return () => {
+      setFiles([])
+    }
+  }, [])
+
   const props = {
     name: 'document',
     multiple: false,
@@ -39,14 +73,6 @@ export default function InvoiceForm({loading, visibility, facture, add, update, 
       Authorization: `Bearer ${user.jwt}`
     },
     maxCount: 1,
-    defaultFileList: facture?.document.id !== 0 ? [
-      {
-        uid: '-1',
-        name: `Facture num : ${facture.id}`,
-        status: 'done',
-        url: facture?.document.document
-      }
-    ] : [],
     onChange(info) {
       const {status} = info.file;
       if (status !== 'uploading') {
@@ -64,19 +90,6 @@ export default function InvoiceForm({loading, visibility, facture, add, update, 
     },
   };
 
-  const inputNumberValidator = (rule, value) => {
-    let min = rule.min
-    const message = rule.message
-    if (min != null) min = Number(min)
-    try {
-      const object = Number(value)
-      if (min != null && object < min) throw new Error(message)
-      if (isNaN(object)) throw new Error(message)
-      return Promise.resolve()
-    } catch (err) {
-      return Promise.reject(err)
-    }
-  }
 
   useEffect(() => {
     form.setFieldsValue(facture)
@@ -132,17 +145,10 @@ export default function InvoiceForm({loading, visibility, facture, add, update, 
         <Form.Item
           name="doc"
           className="col-12 py-1"
-          rules={[{required: true, message: 'Scan du facture obligatoir!'}]}>
+        >
           <Dragger
             {...props}
-            /*fileList={[
-              facture?.document.id !== 0 ? {
-                uid: facture.id,
-                name: `Facture num : ${facture.id}`,
-                status: 'done',
-                url: facture?.document.document
-              } : {}
-            ]}*/
+            fileList={files}
           >
             <p className="ant-upload-drag-icon">
               <InboxOutlined/>
