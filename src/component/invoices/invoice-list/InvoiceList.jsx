@@ -1,15 +1,20 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Col, message, Popconfirm, Row, Table, Tag} from "antd";
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {Col, Form, Input, message, Popconfirm, Row, Select, Statistic, Table, Tag, Tooltip} from "antd";
 import axios from "axios";
-import InvoiceForm from "./InvoiceForm";
+import InvoiceForm, {inputNumberValidator} from "./InvoiceForm";
+import "./invoice.css"
 
 const {Column} = Table;
+const {Option} = Select
 
 function InvoiceList() {
+  let initInvoice = {id: 0, document: {id: 0, document: ""}};
+
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
   const [factures, setFactures] = useState([])
-  const [selectedInvoice, setSelectedInvoice] = useState({id: 0, document: {id: 0, document: ""}})
+  const [selectedInvoice, setSelectedInvoice] = useState(initInvoice)
   const [totalElements, setTotalElements] = useState(0)
   const [pagination, setPagination] = useState({
     current: 1,
@@ -31,9 +36,22 @@ function InvoiceList() {
     },
     [pagination],
   );
+  const chercherFacture = useCallback(
+    async (q) => {
+      await axios({
+        method: 'GET',
+        url: `api/factures?size=${pagination.pageSize}&page=${pagination.current - 1}&total=${q.total}&complete=${q.complete}`,
+      })
+        .then(res => {
+          setFactures(res.data.content);
+          setTotalElements(res.data.totalElements)
+        })
+        .catch(error => console.log('err -> ', error))
+    },
+    [pagination],
+  );
 
   useEffect(() => {
-    console.log("GET FACTURE")
     getFactures()
   }, [getFactures]);
 
@@ -87,15 +105,23 @@ function InvoiceList() {
   }
   let updateInvoice = async (facture) => {
     setVisible(false)
-    await updateOldInvoice(facture).then(res=>{
-
-    })
+    await updateOldInvoice(facture)
   }
 
   const handleEditInvoice = (record) => {
     let invoice = {...record};
     setSelectedInvoice(invoice);
     setVisible(true)
+  }
+
+  const handeCreateInvoice = () => {
+    setSelectedInvoice(initInvoice)
+    setVisible(true)
+  }
+
+  const onFinish = async (values) => {
+    form.resetFields();
+    await chercherFacture(values)
   }
 
   return (
@@ -129,33 +155,87 @@ function InvoiceList() {
                 </div>
                 <div className="col-auto mt-4">
 
-                  <button className="btn btn-block btn-dark" onClick={() => setVisible(true)}>
+                  <button className="btn btn-block btn-dark" onClick={() => handeCreateInvoice()}>
                     <i className="fa fa-user-plus px-2" aria-hidden="true"></i>
                     Ajouter nouvelle facture
                   </button>
                 </div>
               </div>
               <div className="page-header-search mt-4">
-                <div className="input-group input-group-joined">
-                  <input className="form-control"
-                         type="text"
-                         placeholder="chercher..."
-                         aria-label="Search"
-                         autoFocus=""
+                <Form
+                  form={form}
+                  onFinish={onFinish}
+                >
+                  <div class="search-bar">
+                    <div className="row">
+                      <div className="col-8">
+                        <Row justify="space-around">
+                          <Col span={8}>
+                            <Tooltip title="chercher par total du facture :">
+                              <Form.Item
+                                name="total"
+                                rules={[
+                                  {
+                                    min: 1.0,
+                                    message: "Miniment total du prix est 1 DH",
+                                    validator: inputNumberValidator
+                                  },
+                                ]}
+                                style={{marginBottom: 0}}
+                              >
+                                <Input
+                                  type="total"
+                                  defaultValue=""
+                                  placeholder="Entrer un prix : "
+                                  id="query"
+                                  size="large"
+                                  addonAfter={<span>DH</span>}
+                                  allowClear="true"
+                                />
+                              </Form.Item>
+                            </Tooltip>
+                          </Col>
+                          <Col span={8}>
+                            <Form.Item
+                              name="complete"
+                              style={{marginBottom: 0}}
+                            >
+                              <Select  allowClear="true" placeholder="Select l'état du fcture" size="large" style={{width: '200px'}}>
+                                <Option value="true">Facture complet</Option>
+                                <Option value="false">Facture non complet</Option>
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </div>
+                      <div className="col-4">
+                        <Row justify="end">
+                          <Col>
+                            <button type="submit" style={{
+                              border: "none",
+                              backgroundColor: " #fff"
+                            }}>
+                            <span className="input-group-text" id="search">
+                              <svg xmlns="http://www.w3.org/2000/svg"
+                                   width="24" height="24"
+                                   viewBox="0 0 24 24" fill="none"
+                                   stroke="currentColor" strokeWidth="2"
+                                   strokeLinecap="round"
+                                   strokeLinejoin="round"
+                                   className="feather feather-search">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                              </svg>
+                            </span>
+                            </button>
+                          </Col>
+                        </Row>
+                      </div>
 
-                  />
-                  <div className="input-group-append">
-                                        <span className="input-group-text"><svg xmlns="http://www.w3.org/2000/svg"
-                                                                                width="24" height="24"
-                                                                                viewBox="0 0 24 24" fill="none"
-                                                                                stroke="currentColor" strokeWidth="2"
-                                                                                strokeLinecap="round"
-                                                                                strokeLinejoin="round"
-                                                                                className="feather feather-search"><circle
-                                          cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65"
-                                                                               y2="16.65"></line></svg></span>
+                    </div>
+
                   </div>
-                </div>
+                </Form>
               </div>
             </div>
           </div>
@@ -178,14 +258,21 @@ function InvoiceList() {
                       onChange={e => setPagination(e)}
                       size="small"
                       sticky
+                      bordered={true}
                     >
                       <Column title="#Numero" dataIndex="id" key="id" width="100px"/>
                       <Column
                         title="Total"
                         dataIndex="total"
+                        align="left"
                         key="total"
+                        render={(text, record) => {
+                          return (
+                            <Statistic valueStyle={{fontSize:20}} suffix="DH" value={record.total} />
+                          )
+                        }}
                       />
-                      <Column
+                     {/*  <Column
                         title="Document"
                         dataIndex="document"
                         key="document"
@@ -194,12 +281,13 @@ function InvoiceList() {
                             <a href="#" target="_blank">{record.document.document}</a>
                           )
                         }}
-                      />
+                      /> */}
 
                       <Column
                         title="Complete"
                         dataIndex="complete"
                         key="complete"
+                        align="center"
                         render={(text, record) => {
                           if (record.complete === true) {
                             return (
@@ -261,7 +349,8 @@ function InvoiceList() {
         cancel={() => setVisible(false)}
       />
     </div>
-  );
+  )
+    ;
 }
 
 export default InvoiceList;
