@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Col, Form, Input, message, Popconfirm, Row, Select, Statistic, Table, Tag, Tooltip} from "antd";
 import axios from "axios";
 import InvoiceForm, {inputNumberValidator} from "./InvoiceForm";
@@ -123,7 +123,7 @@ function InvoiceList() {
     form.resetFields();
     await chercherFacture(values)
   }
-
+  const [show, setShow] = useState(false);
   return (
     <div id="layoutSidenav_content">
       <main>
@@ -200,7 +200,8 @@ function InvoiceList() {
                               name="complete"
                               style={{marginBottom: 0}}
                             >
-                              <Select  allowClear="true" placeholder="Select l'état du fcture" size="large" style={{width: '200px'}}>
+                              <Select allowClear="true" placeholder="Select l'état du fcture" size="large"
+                                      style={{width: '200px'}}>
                                 <Option value="true">Facture complet</Option>
                                 <Option value="false">Facture non complet</Option>
                               </Select>
@@ -229,11 +230,14 @@ function InvoiceList() {
                             </span>
                             </button>
                           </Col>
+                          <Col>
+                            <span className="input-group-text" id="refresh" onClick={getFactures}>
+                              <i className="fa fa-sync-alt" aria-hidden="true"></i>
+                            </span>
+                          </Col>
                         </Row>
                       </div>
-
                     </div>
-
                   </div>
                 </Form>
               </div>
@@ -268,11 +272,11 @@ function InvoiceList() {
                         key="total"
                         render={(text, record) => {
                           return (
-                            <Statistic valueStyle={{fontSize:20}} suffix="DH" value={record.total} />
+                            <Statistic valueStyle={{fontSize: 20}} suffix="DH" value={record.total}/>
                           )
                         }}
                       />
-                     {/*  <Column
+                      {/*  <Column
                         title="Document"
                         dataIndex="document"
                         key="document"
