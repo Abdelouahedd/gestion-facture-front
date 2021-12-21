@@ -98,6 +98,27 @@ function InvoiceList() {
         .catch(error => console.log('errr -> ', error))
     }, [])
 
+  const deleteInvoice = useCallback(
+    async (id) => {
+      setLoading(true)
+      await axios({
+        method: 'DELETE',
+        url: `api/facture/${id}`,
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then((res) => {
+          setLoading(false)
+          message.success(`Facture num ${id} est supprimé.`);
+        })
+        .catch(error => {
+          message.error(`Error lors de supression du Facture num ${id}.`);
+          console.log('errr -> ', error)
+          setLoading(false)
+        })
+    }, []
+  )
 
   let addNewInvoice = async (facture) => {
     setVisible(false)
@@ -112,6 +133,13 @@ function InvoiceList() {
     let invoice = {...record};
     setSelectedInvoice(invoice);
     setVisible(true)
+  }
+
+  const handleDeleteInvoice=async (id)=>{
+    let bills = factures.filter(f => f.id !== id)
+    setFactures([...bills])
+    console.log("new Factures",factures)
+    await deleteInvoice(id);
   }
 
   const handeCreateInvoice = () => {
@@ -318,7 +346,7 @@ function InvoiceList() {
                             <Col span={4}>
                               <Popconfirm title="Sure to delete?"
                               >
-                                <button className="btn btn-danger btn-sm">
+                                <button className="btn btn-danger btn-sm" onClick={()=>handleDeleteInvoice(record.id)}>
                                   <i className="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                               </Popconfirm>
