@@ -98,6 +98,49 @@ function InvoiceList() {
         .catch(error => console.log('errr -> ', error))
     }, [])
 
+  const deleteInvoice = useCallback(
+    async (id) => {
+      setLoading(true)
+      await axios({
+        method: 'DELETE',
+        url: `api/facture/${id}`,
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then((res) => {
+          setLoading(false)
+          message.success(`Facture num ${id} est supprimé.`);
+        })
+        .catch(error => {
+          message.error(`Error lors de supression du Facture num ${id}.`);
+          console.log('errr -> ', error)
+          setLoading(false)
+        })
+    }, []
+  )
+  const downloadDoc = useCallback(
+    async (idDoc) => {
+      setLoading(true)
+      await axios({
+        method: 'GET',
+        url: `api/document/${idDoc}`,
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then((res) => {
+          console.log(res)
+          setLoading(false)
+          window.open(res.data.document, '_blank')
+        })
+        .catch(error => {
+          message.error(`Error lors de telecharger document ${idDoc}.`);
+          console.log('errr -> ', error)
+          setLoading(false)
+        })
+    }, []
+  )
 
   let addNewInvoice = async (facture) => {
     setVisible(false)
@@ -114,6 +157,16 @@ function InvoiceList() {
     setVisible(true)
   }
 
+  const handleDeleteInvoice = async (id) => {
+    let bills = factures.filter(f => f.id !== id)
+    setFactures([...bills])
+    console.log("new Factures", factures)
+    await deleteInvoice(id);
+  }
+
+  const handleDowloandFile = async (facture) => {
+    await downloadDoc(facture.documentId);
+  }
   const handeCreateInvoice = () => {
     setSelectedInvoice(initInvoice)
     setVisible(true)
@@ -123,7 +176,7 @@ function InvoiceList() {
     form.resetFields();
     await chercherFacture(values)
   }
-  const [show, setShow] = useState(false);
+
   return (
     <div id="layoutSidenav_content">
       <main>
@@ -276,17 +329,6 @@ function InvoiceList() {
                           )
                         }}
                       />
-                      {/*  <Column
-                        title="Document"
-                        dataIndex="document"
-                        key="document"
-                        render={(text, record) => {
-                          return (
-                            <a href="#" target="_blank">{record.document.document}</a>
-                          )
-                        }}
-                      /> */}
-
                       <Column
                         title="Complete"
                         dataIndex="complete"
@@ -318,7 +360,8 @@ function InvoiceList() {
                             <Col span={4}>
                               <Popconfirm title="Sure to delete?"
                               >
-                                <button className="btn btn-danger btn-sm">
+                                <button className="btn btn-danger btn-sm"
+                                        onClick={() => handleDeleteInvoice(record.id)}>
                                   <i className="fa fa-trash" aria-hidden="true"></i>
                                 </button>
                               </Popconfirm>
@@ -329,7 +372,8 @@ function InvoiceList() {
                               </button>
                             </Col>
                             <Col span={4}>
-                              <button className="btn btn-primary btn-sm">
+                              <button disabled={record.documentId == null} className="btn btn-primary btn-sm"
+                                      onClick={() => handleDowloandFile(record)}>
                                 <i className="fa fa-download" aria-hidden="true"></i>
                               </button>
                             </Col>
