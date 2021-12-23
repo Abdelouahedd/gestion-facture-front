@@ -3,6 +3,7 @@ import {Col, Form, Input, message, Popconfirm, Row, Select, Statistic, Table, Ta
 import axios from "axios";
 import InvoiceForm, {inputNumberValidator} from "./InvoiceForm";
 import "./invoice.css"
+import moment from 'moment';
 
 const {Column} = Table;
 const {Option} = Select
@@ -318,6 +319,17 @@ function InvoiceList() {
                       bordered={true}
                     >
                       <Column title="#Numero" dataIndex="id" key="id" width="100px"/>
+                      <Column title="Client" dataIndex="nom" key="nom"/>
+                      <Column
+                        title="Date"
+                        dataIndex="createdDate"
+                        key="createdDate"
+                        render={(text, record) => {
+                          return (
+                            <p>{moment(record.createdDate).format('LL')}</p>
+                          )
+                        }}
+                      />
                       <Column
                         title="Total"
                         dataIndex="total"
