@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import * as Icon from 'react-feather';
 import {Link} from 'react-router-dom';
 import {Menu} from 'antd';
-import {UsergroupDeleteOutlined} from '@ant-design/icons';
+import {FileProtectOutlined, UsergroupDeleteOutlined} from '@ant-design/icons';
 import './sideBar.css'
 
 const {SubMenu} = Menu;
@@ -44,7 +44,7 @@ const SideBar = () => {
                                 </Menu.ItemGroup>
                             </SubMenu>
                           <SubMenu key="factures"
-                                   icon={ <i className="fa fa-file-invoice" aria-hidden="true" style={{ fontSize: '22px' }}></i>}
+                                   icon={<FileProtectOutlined  style={{ fontSize: '22px' }}/>}
                                    title="Gestion des factures"
                           >
                             <Menu.ItemGroup key="g2" title="Factures" >

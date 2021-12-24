@@ -210,7 +210,7 @@ function InvoiceList() {
                 <div className="col-auto mt-4">
 
                   <button className="btn btn-block btn-dark" onClick={() => handeCreateInvoice()}>
-                    <i className="fa fa-user-plus px-2" aria-hidden="true"></i>
+                    <i className="fa fa-file-invoice px-2 " aria-hidden="true"></i>
                     Ajouter nouvelle facture
                   </button>
                 </div>
@@ -409,8 +409,7 @@ function InvoiceList() {
         cancel={() => setVisible(false)}
       />
     </div>
-  )
-    ;
+  );
 }
 
 export default InvoiceList;

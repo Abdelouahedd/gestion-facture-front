@@ -93,7 +93,8 @@ export default function InvoiceForm({loading, visibility, facture, add, update, 
 
   useEffect(() => {
     form.setFieldsValue(facture)
-  }, [form, facture])
+    return () => form.resetFields()
+  }, [form, facture, visibility])
 
 
   return (
