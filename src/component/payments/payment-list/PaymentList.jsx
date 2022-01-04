@@ -1,6 +1,40 @@
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Col, Popconfirm, Row, Select, Statistic, Table, Tag} from "antd";
+import axios from "axios";
+import moment from "moment";
+
+
+const {Column} = Table;
+const {Option} = Select
 
 function PaymentList() {
+  const [loading, setLoading] = useState(false)
+  const [payments, setPayments] = useState([])
+  const [totalElements, setTotalElements] = useState(0)
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+
+
+  const getPayments = useCallback(
+    async () => {
+      await axios({
+        method: 'GET',
+        url: `api/virments?size=${pagination.pageSize}&page=${pagination.current - 1}`,
+      })
+        .then(res => {
+          setPayments(res.data.content);
+          setTotalElements(res.data.totalElements)
+        })
+        .catch(error => console.log('err -> ', error))
+    },
+    [pagination],
+  );
+  useEffect(() => {
+      getPayments()
+    },
+    [getPayments])
   return (
     <div id="layoutSidenav_content">
       <main>
@@ -68,7 +102,113 @@ function PaymentList() {
               <div className="card mb-4">
                 <div className="card-body">
                   <div className="datatable">
+                    <Table
+                      dataSource={payments}
+                      pagination={{
+                        defaultPageSize: 10,
+                        showSizeChanger: true,
+                        total: totalElements,
+                        current: pagination.current,
+                        pageSize: pagination.pageSize
+                      }}
+                      onChange={e => setPagination(e)}
+                      size="small"
+                      sticky
+                      bordered={true}
+                    >
 
+                      <Column title="#Numero"
+                              dataIndex="factureId"
+                              key="factureId"
+                              width="90px"
+                      />
+                      <Column title="Date facture"
+                              dataIndex="factureCreatedDate"
+                              key="factureCreatedDate"
+                              align="center"
+                              render={(text, record) => {
+                                return (
+                                  <p>{moment(record.factureCreatedDate).format('LL')}</p>
+                                )
+                              }}
+                      />
+                      <Column title="Total facture"
+                              dataIndex="factureTotal"
+                              key="factureTotal"
+                              render={(text, record) => {
+                                return (
+                                  <Statistic valueStyle={{fontSize: 20}} suffix="DH" value={record.factureTotal}/>
+                                )
+                              }}
+                      />
+                      <Column title="Nom du client"
+                              dataIndex="factureClientNom"
+                              key="factureClientNom"
+                      />
+                      <Column title="Prenom du client"
+                              dataIndex="factureClientPrenom"
+                              key="factureClientPrenom"
+                      />
+                      <Column title="Payment"
+                              dataIndex="prix"
+                              key="prix"
+                              render={(text, record) => {
+                                return (
+                                  <Statistic valueStyle={{fontSize: 20}} suffix="DH" value={record.prix}/>
+                                )
+                              }}
+                      />
+                      <Column title="Date du payment"
+                              dataIndex="createdDate"
+                              key="createdDate"
+                              align="center"
+                              render={(text, record) => {
+                                return (
+                                  <p>{moment(record.createdDate).format('LL')}</p>
+                                )
+                              }}
+                      />
+                      <Column
+                        title="Complete"
+                        dataIndex="factureComplete"
+                        key="factureComplete"
+                        align="center"
+                        render={(text, record) => {
+                          return record.complete === true ? (
+                            <Tag color="green" key={record.id}>
+                              Facture complet
+                            </Tag>
+                          ) : (
+                            <Tag color="red" key={record.id}>
+                              Facture non complet
+                            </Tag>
+                          );
+                        }}
+                      />
+                      <Column
+                        title="Action"
+                        key="action"
+                        align="center"
+                        render={(text, record) => (
+                          <Row justify="center" gutter={24}>
+                            <Col span={6}>
+                              <Popconfirm title="Sure to delete?"
+                              >
+                                <button className="btn btn-danger btn-sm">
+                                  <i className="fa fa-trash" aria-hidden="true"/>
+                                </button>
+                              </Popconfirm>
+                            </Col>
+                            <Col span={6}>
+                              <button className="btn btn-success btn-sm">
+                                <i className="fa fa-edit" aria-hidden="true"/>
+                              </button>
+                            </Col>
+                          </Row>
+                        )}
+                      />
+
+                    </Table>
                   </div>
                 </div>
               </div>
