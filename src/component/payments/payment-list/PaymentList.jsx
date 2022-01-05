@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Col, Popconfirm, Row, Select, Statistic, Table, Tag} from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -8,6 +8,7 @@ const {Column} = Table;
 const {Option} = Select
 
 function PaymentList() {
+  const client = useRef();
   const [loading, setLoading] = useState(false)
   const [payments, setPayments] = useState([])
   const [totalElements, setTotalElements] = useState(0)
@@ -19,6 +20,7 @@ function PaymentList() {
 
   const getPayments = useCallback(
     async () => {
+      setLoading(true);
       await axios({
         method: 'GET',
         url: `api/virments?size=${pagination.pageSize}&page=${pagination.current - 1}`,
@@ -28,6 +30,7 @@ function PaymentList() {
           setTotalElements(res.data.totalElements)
         })
         .catch(error => console.log('err -> ', error))
+      setLoading(false);
     },
     [pagination],
   );
@@ -35,6 +38,24 @@ function PaymentList() {
       getPayments()
     },
     [getPayments])
+
+  const chercherFacture= useCallback(
+    async (e) => {
+      if (e.key === 'Enter') {
+        await axios({
+          method: 'GET',
+          url: `api/virments?q=${client.current.value}`,
+        })
+          .then(res => {
+            setPayments(res.data.content);
+            setTotalElements(res.data.totalElements)
+          })
+          .catch(error => console.log('err -> ', error))
+      }
+    },
+    [pagination],
+  );
+
   return (
     <div id="layoutSidenav_content">
       <main>
@@ -79,6 +100,8 @@ function PaymentList() {
                          placeholder="chercher..."
                          aria-label="Search"
                          autoFocus=""
+                         ref={client}
+                         onKeyPress={(e) => chercherFacture(e)}
                   />
                   <div className="input-group-append">
                                         <span className="input-group-text"><svg xmlns="http://www.w3.org/2000/svg"
