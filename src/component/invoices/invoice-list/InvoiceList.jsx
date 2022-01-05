@@ -3,6 +3,7 @@ import {Col, Form, Input, message, Popconfirm, Row, Select, Statistic, Table, Ta
 import axios from "axios";
 import InvoiceForm, {inputNumberValidator} from "./InvoiceForm";
 import "./invoice.css"
+import moment from 'moment';
 
 const {Column} = Table;
 const {Option} = Select
@@ -14,6 +15,7 @@ function InvoiceList() {
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
   const [factures, setFactures] = useState([])
+  const [clients, setClients] = useState([])
   const [selectedInvoice, setSelectedInvoice] = useState(initInvoice)
   const [totalElements, setTotalElements] = useState(0)
   const [pagination, setPagination] = useState({
@@ -40,7 +42,7 @@ function InvoiceList() {
     async (q) => {
       await axios({
         method: 'GET',
-        url: `api/factures?size=${pagination.pageSize}&page=${pagination.current - 1}&total=${q.total}&complete=${q.complete}`,
+        url: `api/factures?size=${pagination.pageSize}&page=${pagination.current - 1}&total=${q.total}&complete=${q.complete}&client=${q.client}`,
       })
         .then(res => {
           setFactures(res.data.content);
@@ -49,6 +51,19 @@ function InvoiceList() {
         .catch(error => console.log('err -> ', error))
     },
     [pagination],
+  );
+  const chercherClient = useCallback(
+    async (e) => {
+        await axios({
+          method: 'GET',
+          url: `api/list/clients?q=${e}`,
+        })
+          .then(res => {
+            setClients(res.data);
+          })
+          .catch(error => console.log('err -> ', error))
+    },
+    [],
   );
 
   useEffect(() => {
@@ -173,8 +188,10 @@ function InvoiceList() {
   }
 
   const onFinish = async (values) => {
-    form.resetFields();
-    await chercherFacture(values)
+    if(values.client || values.total || values.complete){
+      form.resetFields();
+      await chercherFacture(values)
+    }
   }
 
   return (
@@ -209,7 +226,7 @@ function InvoiceList() {
                 <div className="col-auto mt-4">
 
                   <button className="btn btn-block btn-dark" onClick={() => handeCreateInvoice()}>
-                    <i className="fa fa-user-plus px-2" aria-hidden="true"></i>
+                    <i className="fa fa-file-invoice px-2 " aria-hidden="true"></i>
                     Ajouter nouvelle facture
                   </button>
                 </div>
@@ -223,7 +240,29 @@ function InvoiceList() {
                     <div className="row">
                       <div className="col-8">
                         <Row justify="space-around">
-                          <Col span={8}>
+                          <Col span={6}>
+                            <Tooltip title="chercher par nom ou prenom du client :">
+                              <Form.Item
+                                name="client"
+                                style={{marginBottom: 0}}
+                              >
+                                <Select
+                                  showSearch
+                                  placeholder="chercher par nom ou prenom du client"
+                                  defaultActiveFirstOption={false}
+                                  showArrow={false}
+                                  filterOption={false}
+                                  onSearch={chercherClient}
+                                  notFoundContent={null}
+                                  allowClear="true"
+                                  size="large"
+                                >
+                                  {clients.map((c)=> <Option value={c.nom} key={c.id}>{c.nom+" "+c.prenom}</Option>)}
+                                </Select>
+                              </Form.Item>
+                            </Tooltip>
+                          </Col>
+                          <Col span={6}>
                             <Tooltip title="chercher par total du facture :">
                               <Form.Item
                                 name="total"
@@ -318,6 +357,17 @@ function InvoiceList() {
                       bordered={true}
                     >
                       <Column title="#Numero" dataIndex="id" key="id" width="100px"/>
+                      <Column title="Client" dataIndex="nom" key="nom"/>
+                      <Column
+                        title="Date"
+                        dataIndex="createdDate"
+                        key="createdDate"
+                        render={(text, record) => {
+                          return (
+                            <p>{moment(record.createdDate).format('LL')}</p>
+                          )
+                        }}
+                      />
                       <Column
                         title="Total"
                         dataIndex="total"
@@ -397,8 +447,7 @@ function InvoiceList() {
         cancel={() => setVisible(false)}
       />
     </div>
-  )
-    ;
+  );
 }
 
 export default InvoiceList;
