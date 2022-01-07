@@ -1,21 +1,36 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Col, Popconfirm, Row, Select, Statistic, Table, Tag} from "antd";
+import {Col, Popconfirm, Row, Statistic, Table, Tag} from "antd";
 import axios from "axios";
 import moment from "moment";
+import PaymentForm from "./PaymentForm";
 
 
 const {Column} = Table;
-const {Option} = Select
+
+var initPayment = {
+  id: 0,
+  factureCreatedDate: Date.now(),
+  /* factureId: "",
+   factureTotal: "",
+   factureComplete: false,
+   factureClientId: "",
+   factureClientNom: "",
+   factureClientPrenom: "",
+   prix: "",*/
+  createdDate: Date.now(),
+}
 
 function PaymentList() {
   const client = useRef();
   const [loading, setLoading] = useState(false)
+  const [visible, setVisible] = useState(false)
   const [payments, setPayments] = useState([])
   const [totalElements, setTotalElements] = useState(0)
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
   });
+  const [selectedPayment, setSelectedPayment] = useState(initPayment);
 
 
   const getPayments = useCallback(
@@ -39,7 +54,7 @@ function PaymentList() {
     },
     [getPayments])
 
-  const chercherFacture= useCallback(
+  const chercherFacture = useCallback(
     async (e) => {
       if (e.key === 'Enter') {
         await axios({
@@ -87,7 +102,7 @@ function PaymentList() {
                 </div>
                 <div className="col-auto mt-4">
 
-                  <button className="btn btn-block btn-dark">
+                  <button className="btn btn-block btn-dark" onClick={() => setVisible(true)}>
                     <i className="fas fa-cash-register px-2" aria-hidden="true"/>
                     Ajouter nouveau payment
                   </button>
@@ -239,6 +254,12 @@ function PaymentList() {
           </div>
         </div>
       </main>
+      <PaymentForm
+        payment={selectedPayment}
+        loading={loading}
+        visibility={visible}
+        cancel={() => setVisible(false)}
+      />
     </div>
   );
 }
