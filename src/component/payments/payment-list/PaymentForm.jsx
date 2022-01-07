@@ -13,17 +13,14 @@ function PaymentForm({loading, visibility, payment, update, add, cancel}) {
 
 
   const onFinish = async (values) => {
-    console.log(values)
+    const virmentRequest = {
+      idFacture:values.factureId,
+      prix:values.prix
+    }
     if (payment.id === 0) {
-      console.log("payment add ")
-      const virmentRequest = {
-        idFacture:values.factureId,
-        prix:values.prix
-      }
-      //  await add(newClient)
+       await add(virmentRequest)
     } else {
-      console.log("payment update ")
-      //  await update({...values, id: payment.id});
+       await update({...values, id: payment.id});
     }
   }
   useEffect(() => {
