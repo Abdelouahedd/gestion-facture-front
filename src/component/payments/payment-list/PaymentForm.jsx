@@ -20,7 +20,7 @@ function PaymentForm({loading, visibility, payment, update, add, cancel}) {
     if (payment.id === 0) {
        await add(virmentRequest)
     } else {
-       await update({...values, id: payment.id});
+       await update({...virmentRequest, id: payment.id});
     }
   }
   useEffect(() => {

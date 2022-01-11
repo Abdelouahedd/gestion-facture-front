@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Col, Popconfirm, Row, Statistic, Table, Tag} from "antd";
+import {Col, message, Popconfirm, Row, Statistic, Table, Tag} from "antd";
 import axios from "axios";
 import moment from "moment";
 import PaymentForm from "./PaymentForm";
@@ -10,13 +10,6 @@ const {Column} = Table;
 var initPayment = {
   id: 0,
   factureCreatedDate: Date.now(),
-  /* factureId: "",
-   factureTotal: "",
-   factureComplete: false,
-   factureClientId: "",
-   factureClientNom: "",
-   factureClientPrenom: "",
-   prix: "",*/
   createdDate: Date.now(),
 }
 
@@ -71,6 +64,82 @@ function PaymentList() {
     [pagination],
   );
 
+  const addPayment = useCallback(
+    async (paymentRequest) => {
+      setLoading(true)
+      await axios({
+        method: 'POST',
+        url: `api/virment`,
+        data: JSON.stringify(paymentRequest),
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then(res => {
+          setLoading(false)
+          message.success(`Virment ${res.data.prix} DH bien ajoutée.`);
+          let newPayments = [res.data, ...payments]
+          setPagination({current: 1, pageSize: 11})
+          setPayments(newPayments)
+          setVisible(false);
+        })
+        .catch(error => console.log('errr -> ', error))
+    }, []
+  )
+  const updatePayment = useCallback(
+    async (paymentRequest) => {
+      setLoading(true)
+      await axios({
+        method: 'PUT',
+        url: `api/virment/${paymentRequest.id}`,
+        data: JSON.stringify(paymentRequest),
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then(res => {
+          let newPayments = payments.map((f) => (res.data.id === f.id ? res.data : f))
+          setPayments(newPayments)
+          setLoading(false)
+          message.success(`Virment ${res.data.prix} DH bien modifiée.`);
+          setVisible(false);
+        })
+        .catch(error => console.log('errr -> ', error))
+    }, [])
+
+  const deletePayment = useCallback(
+    async (id) => {
+      setLoading(true)
+      await axios({
+        method: 'DELETE',
+        url: `api/virment/${id}`,
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        }
+      })
+        .then(async (res) => {
+          await getPayments();
+          setLoading(false)
+          message.success(`Virment num ${id} est supprimé.`);
+        })
+        .catch(error => {
+          message.error(`Error lors de supression du virment num ${id}.`);
+          console.log('errr -> ', error)
+          setLoading(false)
+        })
+    }, []
+  )
+
+  const handleAddPayment = () => {
+    setSelectedPayment(initPayment);
+    setVisible(true);
+  }
+
+  const handleUpdatePayment = async (payment) => {
+    setSelectedPayment(payment);
+    setVisible(true);
+  }
+
   return (
     <div id="layoutSidenav_content">
       <main>
@@ -102,7 +171,7 @@ function PaymentList() {
                 </div>
                 <div className="col-auto mt-4">
 
-                  <button className="btn btn-block btn-dark" onClick={() => setVisible(true)}>
+                  <button className="btn btn-block btn-dark" onClick={() => handleAddPayment()}>
                     <i className="fas fa-cash-register px-2" aria-hidden="true"/>
                     Ajouter nouveau payment
                   </button>
@@ -212,7 +281,7 @@ function PaymentList() {
                         key="factureComplete"
                         align="center"
                         render={(text, record) => {
-                          return record.complete === true ? (
+                          return record.factureComplete === true ? (
                             <Tag color="green" key={record.id}>
                               Facture complet
                             </Tag>
@@ -231,14 +300,15 @@ function PaymentList() {
                           <Row justify="center" gutter={24}>
                             <Col span={6}>
                               <Popconfirm title="Sure to delete?"
+                                          onConfirm={() => deletePayment(record.id)}
                               >
-                                <button className="btn btn-danger btn-sm">
+                                <button className="btn btn-danger btn-sm" >
                                   <i className="fa fa-trash" aria-hidden="true"/>
                                 </button>
                               </Popconfirm>
                             </Col>
                             <Col span={6}>
-                              <button className="btn btn-success btn-sm">
+                              <button className="btn btn-success btn-sm" onClick={() => handleUpdatePayment(record)}>
                                 <i className="fa fa-edit" aria-hidden="true"/>
                               </button>
                             </Col>
@@ -258,6 +328,8 @@ function PaymentList() {
         payment={selectedPayment}
         loading={loading}
         visibility={visible}
+        add={addPayment}
+        update={updatePayment}
         cancel={() => setVisible(false)}
       />
     </div>
