@@ -15798,7 +15798,7 @@ body {
   display: flex;
 }
 #layoutSidenav #layoutSidenav_nav {
-  flex-basis: 15rem;
+  flex-basis: 17rem;
   flex-shrink: 0;
   transition: transform 0.15s ease-in-out;
   z-index: 1038;
