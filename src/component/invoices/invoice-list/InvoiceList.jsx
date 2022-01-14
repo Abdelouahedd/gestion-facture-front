@@ -10,7 +10,7 @@ const {Option} = Select
 
 function InvoiceList() {
   let initInvoice = {id: 0, document: {id: 0, document: ""}};
-
+  const initQuery = {total: "", complete: "", client: ""};
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
@@ -18,6 +18,7 @@ function InvoiceList() {
   const [clients, setClients] = useState([])
   const [selectedInvoice, setSelectedInvoice] = useState(initInvoice)
   const [totalElements, setTotalElements] = useState(0)
+  const [query, setQuery] = useState(initQuery)
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -31,6 +32,8 @@ function InvoiceList() {
         url: `api/factures?size=${pagination.pageSize}&page=${pagination.current - 1}`,
       })
         .then(res => {
+          form.resetFields();
+          setQuery(initQuery)
           setFactures(res.data.content);
           setTotalElements(res.data.totalElements)
         })
@@ -38,11 +41,12 @@ function InvoiceList() {
     },
     [pagination],
   );
+
   const chercherFacture = useCallback(
-    async (q) => {
+    async () => {
       await axios({
         method: 'GET',
-        url: `api/factures?size=${pagination.pageSize}&page=${pagination.current - 1}&total=${q.total}&complete=${q.complete}&client=${q.client}`,
+        url: `api/factures?size=${pagination.pageSize}&page=${pagination.current - 1}&total=${query.total}&complete=${query.complete}&client=${query.client}`,
       })
         .then(res => {
           setFactures(res.data.content);
@@ -50,7 +54,7 @@ function InvoiceList() {
         })
         .catch(error => console.log('err -> ', error))
     },
-    [pagination],
+    [pagination,query],
   );
   const chercherClient = useCallback(
     async (e) => {
@@ -67,8 +71,8 @@ function InvoiceList() {
   );
 
   useEffect(() => {
-    getFactures()
-  }, [getFactures]);
+    chercherFacture();
+  }, [chercherFacture]);
 
   const addInvoice = useCallback(
     async (factureRequest) => {
@@ -123,7 +127,7 @@ function InvoiceList() {
           'Content-Type': 'application/json;charset=utf-8'
         }
       })
-        .then((res) => {
+        .then(() => {
           setLoading(false)
           message.success(`Facture num ${id} est supprimé.`);
         })
@@ -187,11 +191,9 @@ function InvoiceList() {
     setVisible(true)
   }
 
-  const onFinish = async (values) => {
-    if(values.client || values.total || values.complete){
-      form.resetFields();
-      await chercherFacture(values)
-    }
+  const onFinish =  (values) => {
+    if (values.client || values.total || values.complete)
+      setQuery(values);
   }
 
   return (
@@ -236,7 +238,7 @@ function InvoiceList() {
                   form={form}
                   onFinish={onFinish}
                 >
-                  <div class="search-bar">
+                  <div className="search-bar">
                     <div className="row">
                       <div className="col-8">
                         <Row justify="space-around">
@@ -316,15 +318,15 @@ function InvoiceList() {
                                    strokeLinecap="round"
                                    strokeLinejoin="round"
                                    className="feather feather-search">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                               </svg>
                             </span>
                             </button>
                           </Col>
                           <Col>
                             <span className="input-group-text" id="refresh" onClick={getFactures}>
-                              <i className="fa fa-sync-alt" aria-hidden="true"></i>
+                              <i className="fa fa-sync-alt" aria-hidden="true"/>
                             </span>
                           </Col>
                         </Row>
@@ -412,19 +414,19 @@ function InvoiceList() {
                               >
                                 <button className="btn btn-danger btn-sm"
                                         onClick={() => handleDeleteInvoice(record.id)}>
-                                  <i className="fa fa-trash" aria-hidden="true"></i>
+                                  <i className="fa fa-trash" aria-hidden="true"/>
                                 </button>
                               </Popconfirm>
                             </Col>
                             <Col span={4}>
                               <button className="btn btn-success btn-sm" onClick={() => handleEditInvoice(record)}>
-                                <i className="fa fa-edit" aria-hidden="true"></i>
+                                <i className="fa fa-edit" aria-hidden="true"/>
                               </button>
                             </Col>
                             <Col span={4}>
                               <button disabled={record.documentId == null} className="btn btn-primary btn-sm"
                                       onClick={() => handleDowloandFile(record)}>
-                                <i className="fa fa-download" aria-hidden="true"></i>
+                                <i className="fa fa-download" aria-hidden="true"/>
                               </button>
                             </Col>
                           </Row>

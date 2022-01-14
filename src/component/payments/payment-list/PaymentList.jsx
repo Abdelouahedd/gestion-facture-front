@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Col, message, Popconfirm, Row, Statistic, Table, Tag} from "antd";
+import {Col, message, Popconfirm, Row, Statistic, Table, Tag,Tooltip} from "antd";
 import axios from "axios";
 import moment from "moment";
 import PaymentForm from "./PaymentForm";
@@ -7,11 +7,11 @@ import PaymentForm from "./PaymentForm";
 
 const {Column} = Table;
 
-var initPayment = {
+const initPayment = {
   id: 0,
   factureCreatedDate: Date.now(),
   createdDate: Date.now(),
-}
+};
 
 function PaymentList() {
   const client = useRef();
@@ -117,7 +117,7 @@ function PaymentList() {
           'Content-Type': 'application/json;charset=utf-8'
         }
       })
-        .then(async (res) => {
+        .then(async () => {
           await getPayments();
           setLoading(false)
           message.success(`Virment num ${id} est supprimé.`);
@@ -179,6 +179,7 @@ function PaymentList() {
               </div>
               <div className="page-header-search mt-4">
                 <div className="input-group input-group-joined">
+                  <Tooltip title="chercher par nom ou prenom du client :">
                   <input className="form-control"
                          type="text"
                          placeholder="chercher..."
@@ -187,6 +188,7 @@ function PaymentList() {
                          ref={client}
                          onKeyPress={(e) => chercherFacture(e)}
                   />
+                  </Tooltip>
                   <div className="input-group-append">
                                         <span className="input-group-text"><svg xmlns="http://www.w3.org/2000/svg"
                                                                                 width="24" height="24"
