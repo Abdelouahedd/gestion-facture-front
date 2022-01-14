@@ -40,6 +40,7 @@ export const useUserAuthentication = () => {
                     history.push('/login');
                 }
             } catch (err) {
+                history.push('/login');
                 setError(err);
             } finally {
                 setLoading(false);
