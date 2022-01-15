@@ -1,7 +1,12 @@
 import React from 'react'
 import * as Icon from "react-feather";
 import Footer from "../shared/footer/Footer";
-import NumberInvoiceMonth from "../invoices/invoice-chart/NumberInvoiceMonth";
+import NumberInvoiceMonth from "../invoices/invoice-chart/chart/NumberInvoiceMonth";
+import CountUserCard from "../clients/chart/CountUserCard";
+import CountBillsCard from "../invoices/invoice-chart/Card/CountBillsCard";
+import TotalPriceBillsCard from "../invoices/invoice-chart/Card/TotalPriceBillsCard";
+import NumberInvoiceByStatus from "../invoices/invoice-chart/chart/NumberInvoiceByStatus";
+import TotalPriceMonth from "../invoices/invoice-chart/chart/TotalPriceMonth";
 
 const Main = () => {
   const {REACT_APP_URL} = process.env;
@@ -49,26 +54,29 @@ const Main = () => {
               </div>
             </div>
           </div>
+          <div className="row">
+            <div className="col-xxl-4 col-lg-4">
+              <CountUserCard/>
+            </div>
+            <div className="col-xxl-4 col-lg-4">
+              <CountBillsCard/>
+            </div>
+            <div className="col-xxl-4 col-lg-4 ">
+              <TotalPriceBillsCard/>
+            </div>
+          </div>
 
           <div className="row">
             <div className="col-xxl-6 col-xl-6 mb-4 ">
               <NumberInvoiceMonth/>
             </div>
-
             <div className="col-xxl-6 col-xl-6 mb-4">
-              <div className="card card-header-actions h-100">
-                <div className="card-header">
-                  Les notes de chaque elemnt de module
-                </div>
-                <div className="card-body">
-                  {/*<Pie
-                                        data={dataPie}
-                                        width={100}
-                                        height={300}
-                                        options={{maintainAspectRatio: false}}
-                                    />*/}
-                </div>
-              </div>
+              <NumberInvoiceByStatus/>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-xxl-12 col-xl-12 mb-4 ">
+              <TotalPriceMonth/>
             </div>
           </div>
         </div>
