@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  frontend-gestion-facture:
+    image: gestion-facture:front
+    container_name: Facturefrontend
+    build:
+      context: .
+      dockerfile: .Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - docker_api-network
+
+networks:
+  docker_api-network:
+    external: true
