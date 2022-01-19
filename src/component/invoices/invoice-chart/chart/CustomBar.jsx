@@ -1,8 +1,8 @@
 import React from 'react';
-import {Bar} from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
 
-function CustomBar({title,labels,data}) {
+function CustomBar({ title, labels, data }) {
 
   const option = {
     labels: labels,
@@ -34,9 +34,9 @@ function CustomBar({title,labels,data}) {
   return (
     <Bar
       data={option}
-      width={100}
-      height={300}
-      options={{maintainAspectRatio: false,}}
+      width={null}
+      height={null}
+      options={{aspectRatio: 0, }}
     />
   );
 }

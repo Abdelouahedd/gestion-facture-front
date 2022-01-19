@@ -9,11 +9,11 @@ function CountUserCard() {
       await axios.get("api/clients/count")
         .then(res => setCNbrCustomer(res.data))
         .catch(err => console.error(err))
-    }, [nbrCustomer])
+    }, [])
 
   useEffect(() => {
     getCountCustomer();
-  }, [getCountCustomer()])
+  }, [getCountCustomer])
 
   return (
     <div className="card bg-primary text-white mb-4">

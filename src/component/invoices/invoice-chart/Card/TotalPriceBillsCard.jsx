@@ -11,11 +11,11 @@ function TotalPriceBillsCard() {
       await axios.get("api/factures/price")
         .then(res => setTotaPrice(res.data))
         .catch(err => console.error(err))
-    }, [totalPrice])
+    }, [])
 
   useEffect(() => {
     getTotalPriceBills();
-  }, [getTotalPriceBills()])
+  }, [getTotalPriceBills])
 
   return (
     <div className="card bg-success text-white mb-4">

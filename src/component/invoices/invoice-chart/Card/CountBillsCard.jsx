@@ -9,11 +9,11 @@ function CountBillsCard() {
       await axios.get("api/factures/count")
         .then(res => setNbrBills(res.data))
         .catch(err => console.error(err))
-    }, [nbrBills])
+    }, [])
 
   useEffect(() => {
     getCountBills();
-  }, [getCountBills()])
+  }, [getCountBills])
 
   return (
     <div className="card bg-warning text-white mb-4">
