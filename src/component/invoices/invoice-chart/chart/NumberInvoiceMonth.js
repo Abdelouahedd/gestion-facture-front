@@ -58,8 +58,8 @@ function NumberInvoiceMonth() {
           labels={factureMonth.map(f => f.month)}
           data={factureMonth.map(f => f.number)}
         />
+        </div>
       </div>
-    </div>
   );
 }
 

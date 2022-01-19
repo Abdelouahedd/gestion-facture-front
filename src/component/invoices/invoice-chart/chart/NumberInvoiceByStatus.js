@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Pie} from "react-chartjs-2"
+import React, { useCallback, useEffect, useState } from 'react';
+import { Pie } from "react-chartjs-2"
 import axios from "axios";
 
 function NumberInvoiceByStatus() {
 
-  const[data,setData]=  useState([]);
+  const [data, setData] = useState([]);
 
   const getNumberInvoicesByStatus = useCallback(
     async () => {
@@ -17,17 +17,17 @@ function NumberInvoiceByStatus() {
     getNumberInvoicesByStatus();
   }, [getNumberInvoicesByStatus])
 
-
+  console.log("mounted");
 
   const option = {
-    labels: data.map(d=>d.status),
+    labels: data.map(d => d.status),
     datasets: [
       {
         label: "Nombre de facture par status",
         fill: false,
         lineTension: 0,
-        backgroundColor: ['rgba(255, 99, 132, 0.2)','rgba(75, 192, 192, 0.2)'],
-        borderColor: ['rgba(255, 99, 132, 0.2)','rgba(75, 192, 192, 0.2)'],
+        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+        borderColor: ['rgba(255, 99, 132, 0.2)', 'rgba(75, 192, 192, 0.2)'],
         borderCapStyle: 'butt',
         borderDash: [],
         borderDashOffset: 0.0,
@@ -41,7 +41,8 @@ function NumberInvoiceByStatus() {
         pointHoverBorderWidth: 2,
         pointRadius: 1,
         pointHitRadius: 10,
-        data: data.map(d=>d.number)
+        data: data.map(d => d.number),
+
       }
     ]
   };
@@ -53,9 +54,9 @@ function NumberInvoiceByStatus() {
       <div className="card-body">
         <Pie
           data={option}
-          width={100}
-          height={300}
-          options={{maintainAspectRatio: false}}
+          width={null}
+          height={null}
+          options={{ aspectRatio: 0, }}
         />
       </div>
     </div>

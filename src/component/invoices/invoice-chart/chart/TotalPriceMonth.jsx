@@ -1,5 +1,5 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Line} from "react-chartjs-2";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Line } from "react-chartjs-2";
 import axios from "axios";
 
 
@@ -57,35 +57,37 @@ function TotalPriceMonth() {
       </div>
       <div className="card-body">
         <Line
-          width={100}
-          height={300}
+          width={null}
+          height={null}
           data={
             {
               labels: labels,
               datasets: [
                 {
                   label: "Facture",
-                  fill: false,
-                  lineTension: 0,
                   borderColor: 'rgb(255, 99, 132)',
                   backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                  data: dataBills.map(bil => bil.total)
+                  data: dataBills.map(bil => bil.total),
+                  aspectRatio: 0,
                 },
                 {
                   label: 'Virment',
                   data: dataPayment.map(pay => pay.total),
                   borderColor: 'rgb(53, 162, 235)',
                   backgroundColor: 'rgba(53, 162, 235)',
+                  aspectRatio: 0,
                 },
               ]
             }
           }
           options={
             {
-              maintainAspectRatio: false, title: {
+
+              title: {
                 display: true,
                 text: 'Line des entrees et sorties',
               },
+            
             }
           }
         />
