@@ -1,9 +1,11 @@
 import React, {useEffect} from 'react'
-import {Form, Input, Modal} from 'antd';
+import {Col, Form, Input, Modal, Row} from 'antd';
+import {PhoneOutlined} from "@ant-design/icons";
 
 export default function ClientForm({loading, visibility, client, update, add, cancel}) {
 
   const [form] = Form.useForm();
+  const patternValidatePhone = new RegExp(/^[0-9\b]+$/);
 
   const onFinish = async (values) => {
     if (client.id === 0) {
@@ -22,6 +24,7 @@ export default function ClientForm({loading, visibility, client, update, add, ca
   useEffect(() => {
     form.setFieldsValue(client)
   }, [form, client])
+
   return (
     <Modal
       title="Mise a jour du client"
@@ -43,44 +46,52 @@ export default function ClientForm({loading, visibility, client, update, add, ca
     >
       <Form
         form={form}
-        className="row g-3"
-        //onFinish={onFinish}
+        className="g-3"
         layout="vertical"
         initialValues={{...client}}
       >
-        <Form.Item
-          name="nom"
-          className="small mb-1 my-4 "
-          label={<label htmlFor="inputEmail4" className="form-label">Nom</label>}
-          rules={[{required: true, message: 'Nom du client est obligatoir!'}]}
-        >
-          <Input
-            className="form-control py-2"
-            id="inputEmail4"
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="prenom"
-          className="small mb-1 my-4 mx-4"
-          label={<label htmlFor="inputPassword4" className="form-label">Prenom</label>}
-          rules={[{required: true, message: 'Prenom du client est obligatoir!'}]}
-        >
-          <Input
-            className="form-control py-2"
-            id="inputPassword4"/>
-        </Form.Item>
+        <Row gutter={[16, 16]}>
+          <Col span={12}>
+            <Form.Item
+              name="nom"
+              label={<label htmlFor="inputEmail4" className="form-label">Nom</label>}
+              rules={[{required: true, message: 'Nom du client est obligatoir!'}]}
+            >
+              <Input
+                className="py-1 w-100"
+                id="inputEmail4"
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="prenom"
+              label={<label htmlFor="inputPassword4" className="form-label">Prenom</label>}
+              rules={[{required: true, message: 'Prenom du client est obligatoir!'}]}
+            >
+              <Input
+                className="py-1 w-100"
+                id="inputPassword4"/>
+            </Form.Item>
+          </Col>
+        </Row>
         <Form.Item
           name="telephone"
-          className="col-12 py-3"
+          className="col-12"
           label={<label htmlFor="inputAddress" className="form-label">Telephone</label>}
-          rules={[{required: true, message: 'Telephone du client est obligatoir!'}]}
+          rules={[{required: true, message: 'Telephone du client est obligatoir!'}
+            , {pattern: patternValidatePhone, message: 'Telephone format 0625458963!'}
+            , {len: 10, message: 'Telephone ne peut pas dépasser 10 nombre!'}
+          ]}
         >
           <Input
             id="inputAddress"
-            className="form-control py-2"
+            className="py-1 w-100"
+            addonBefore={<span>+212</span>}
+            addonAfter={<PhoneOutlined/>}
           />
         </Form.Item>
+
       </Form>
 
     </Modal>
