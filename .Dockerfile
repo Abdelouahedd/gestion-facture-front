@@ -1,6 +1,7 @@
 FROM node:14 as build
 WORKDIR /app
 COPY package*.json ./
+ENV REACT_APP_ENVIRONMENT=production
 RUN npm install
 RUN npm install react-scripts -g
 COPY . .

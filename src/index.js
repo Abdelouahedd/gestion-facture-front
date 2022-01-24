@@ -6,6 +6,12 @@ import './index.css'
 import 'antd/dist/antd.css';
 import '@fortawesome/fontawesome-free/css/all.css'
 
+
+if (process.env.REACT_APP_ENVIRONMENT === 'production') {
+  console.log(process.env.REACT_APP_ENVIRONMENT)
+  console.log = function () {};
+}
+
 ReactDOM.render(
   <React.Fragment>
     <App />
